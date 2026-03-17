@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otonex | Premium İkinci El Araç Alım Satım</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .step-container { display: none; animation: fadeIn 0.5s ease-out; }
+        .step-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .parca { transition: all 0.3s ease; }
+        .parca:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-blue-200 selection:text-blue-900">
+    
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-slate-200">
+        <div class="container mx-auto flex justify-between items-center p-5 max-w-6xl">
+            <div class="flex items-center gap-2">
+                <div class="bg-blue-600 text-white p-2 rounded-lg leading-none">
+                    <i class="fa-solid fa-car-side text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">OTONEX</h1>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-semibold text-slate-600">
+                <a href="javascript:void(0)" onclick="metinModalGoster('hakkimizda')" class="hover:text-blue-600 transition">Hakkımızda</a>
+                <a href="javascript:void(0)" onclick="metinModalGoster('iletisim')" class="hover:text-blue-600 transition">İletişim</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="container mx-auto mt-10 p-4 flex-grow flex flex-col items-center w-full max-w-6xl">
+        
+        <div class="flex justify-center mb-10 w-full">
+            <div class="bg-slate-200/70 p-1.5 rounded-2xl flex space-x-1 w-full max-w-md shadow-inner">
+                <button onclick="anaSekmeDegistir('al')" id="tab-al" class="w-1/2 py-3.5 rounded-xl font-bold bg-white text-blue-600 shadow-sm transition-all duration-300 text-[15px] flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-key"></i> Araç Al
+                </button>
+                <button onclick="anaSekmeDegistir('sat')" id="tab-sat" class="w-1/2 py-3.5 rounded-xl font-bold text-slate-500 hover:text-slate-700 transition-all duration-300 text-[15px] flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Araç Sat
+                </button>
+            </div>
+        </div>
+
+        <div id="vitrin-bolumu" class="w-full block">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-extrabold mb-3 text-slate-900">Hayalinizdeki Aracı Bulun</h2>
+                <p class="text-slate-500 text-base max-w-2xl mx-auto">Otonex güvencesiyle, detaylı ekspertizi yapılmış premium ikinci el araçlar.</p>
+            </div>
+            
+            <div id="musteriIlanListesi" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="col-span-full text-center py-10 text-slate-400 font-semibold"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 block"></i> İlanlar Yükleniyor...</div>
+            </div>
+        </div>
+
+        <div id="degerleme-bolumu" class="w-full hidden flex-col items-center">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-extrabold mb-3 text-slate-900">Aracınızın Gerçek Değerini Öğrenin</h2>
+                <p class="text-slate-500 text-base max-w-2xl mx-auto">Uzman ekibimiz tarafından yapılacak fiyatlandırma için aracınızın bilgilerini girin.</p>
+            </div>
+
+            <div class="bg-white p-6 md:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] w-full max-w-3xl border border-slate-100">
+                <div class="mb-10">
+                    <div class="flex justify-between text-xs font-bold text-slate-300 mb-3 px-2 uppercase tracking-wider">
+                        <span id="step-text-1" class="text-blue-600 flex flex-col items-center gap-1"><i class="fa-solid fa-car text-lg"></i> Araç</span>
+                        <span id="step-text-2" class="flex flex-col items-center gap-1"><i class="fa-solid fa-cogs text-lg"></i> Donanım</span>
+                        <span id="step-text-3" class="flex flex-col items-center gap-1"><i class="fa-solid fa-clipboard-check text-lg"></i> Durum</span>
+                        <span id="step-text-4" class="flex flex-col items-center gap-1"><i class="fa-solid fa-user text-lg"></i> İletişim</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5">
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 25%"></div>
+                    </div>
+                </div>
+
+                <form id="degerlemeFormu">
+                    <div id="step1" class="step-container active">
+                        <h3 class="text-2xl font-bold mb-6 text-slate-800">Temel Bilgiler</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Model Yılı</label>
+                                <select id="yil" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Marka</label>
+                                <select id="marka" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Audi">Audi</option>
+                                    <option value="BMW">BMW</option>
+                                    <option value="Citroen">Citroen</option>
+                                    <option value="Dacia">Dacia</option>
+                                    <option value="Fiat">Fiat</option>
+                                    <option value="Ford">Ford</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Hyundai">Hyundai</option>
+                                    <option value="Kia">Kia</option>
+                                    <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                    <option value="Nissan">Nissan</option>
+                                    <option value="Opel">Opel</option>
+                                    <option value="Peugeot">Peugeot</option>
+                                    <option value="Renault">Renault</option>
+                                    <option value="Seat">Seat</option>
+                                    <option value="Skoda">Skoda</option>
+                                    <option value="Toyota">Toyota</option>
+                                    <option value="Volkswagen">Volkswagen</option>
+                                    <option value="Volvo">Volvo</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Model</label>
+                                <select id="model" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Önce Marka Seçiniz</option>
+                                </select>
+                                <input type="text" id="diger_model" placeholder="Modeli yazınız" class="hidden w-full mt-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Dış Renk</label>
+                                <select id="renk" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Beyaz">Beyaz</option>
+                                    <option value="Siyah">Siyah</option>
+                                    <option value="Gri">Gri</option>
+                                    <option value="Gümüş">Gümüş</option>
+                                    <option value="Kırmızı">Kırmızı</option>
+                                    <option value="Mavi">Mavi</option>
+                                    <option value="Lacivert">Lacivert</option>
+                                    <option value="Bordo">Bordo</option>
+                                    <option value="Yeşil">Yeşil</option>
+                                    <option value="Kahverengi">Kahverengi</option>
+                                    <option value="Sarı">Sarı</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Kilometre</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-gauge-high text-slate-400"></i></div>
+                                    <input type="number" id="kilometre" placeholder="Örn: 120000" class="w-full pl-11 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="nextStep(1)" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all">Sonraki Adım <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                    </div>
+
+                    <div id="step2" class="step-container">
+                        <h3 class="text-2xl font-bold mb-6 text-slate-800">Motor ve Donanım</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Yakıt Tipi</label>
+                                <select id="yakit" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Benzin">Benzin</option>
+                                    <option value="Dizel">Dizel</option>
+                                    <option value="LPG & Benzin">LPG & Benzin</option>
+                                    <option value="Hibrit">Hibrit (MHEV/PHEV)</option>
+                                    <option value="Elektrik">Elektrik (%100 EV)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Şanzıman</label>
+                                <select id="sanziman" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Otomatik">Otomatik</option>
+                                    <option value="Yarı Otomatik">Yarı Otomatik</option>
+                                    <option value="Manuel">Manuel</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Motor Hacmi / Gücü</label>
+                                <select id="motor" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Önce Model Seçiniz</option>
+                                </select>
+                                <input type="text" id="diger_motor" placeholder="Örn: 1.5 dCi veya 150 kW" class="hidden w-full mt-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Donanım Paketi</label>
+                                <select id="donanim" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Önce Model Seçiniz</option>
+                                </select>
+                                <input type="text" id="diger_donanim" placeholder="Örn: AMG, Highline" class="hidden w-full mt-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Sunroof / Cam Tavan</label>
+                                <select id="sunroof" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Var">Evet, Var</option>
+                                    <option value="Yok">Hayır, Yok</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4 mt-8">
+                            <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition-all"><i class="fa-solid fa-arrow-left mr-2"></i> Geri</button>
+                            <button type="button" onclick="nextStep(2)" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all">Sonraki Adım <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="step3" class="step-container">
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Ekspertiz Durumu</h3>
+                            <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl flex gap-4 items-start">
+                                <i class="fa-solid fa-circle-info text-blue-500 text-xl mt-0.5"></i>
+                                <div>
+                                    <h4 class="font-bold text-blue-900">Bilgilerin doğruluğu fiyat teklifi için önemlidir</h4>
+                                    <p class="text-sm text-blue-700 mt-1">Düzenlemek istediğin parçaya dokunarak durumunu (Boyalı / Değişmiş) güncelleyebilirsin.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center gap-2 sm:gap-4 my-8 select-none">
+                            <div class="flex flex-col gap-2 justify-center mt-8 sm:mt-10 mb-8 sm:mb-10">
+                                <div id="sol_on_camurluk" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-tl-[2rem] rounded-bl-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sol_on_camurluk')">Sol Ön<br>Çam.</div>
+                                <div id="sol_on_kapi" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sol_on_kapi')">Sol Ön<br>Kapı</div>
+                                <div id="sol_arka_kapi" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sol_arka_kapi')">Sol Arka<br>Kapı</div>
+                                <div id="sol_arka_camurluk" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-bl-[2rem] rounded-tl-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sol_arka_camurluk')">Sol Arka<br>Çam.</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <div id="on_tampon" class="parca bg-slate-200 w-32 h-10 sm:w-40 sm:h-12 rounded-t-[2rem] shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('on_tampon')">Ön Tampon</div>
+                                <div id="kaput" class="parca bg-slate-200 w-32 h-20 sm:w-40 sm:h-24 rounded-t-2xl shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-xs font-bold text-slate-600" onclick="parcaTikla('kaput')">Kaput</div>
+                                <div id="tavan" class="parca bg-slate-200 w-32 h-32 sm:w-40 sm:h-40 rounded-xl shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-xs font-bold text-slate-600" onclick="parcaTikla('tavan')">Tavan</div>
+                                <div id="bagaj" class="parca bg-slate-200 w-32 h-16 sm:w-40 sm:h-20 rounded-b-2xl shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-xs font-bold text-slate-600" onclick="parcaTikla('bagaj')">Bagaj</div>
+                                <div id="arka_tampon" class="parca bg-slate-200 w-32 h-10 sm:w-40 sm:h-12 rounded-b-[2rem] shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('arka_tampon')">Arka Tampon</div>
+                            </div>
+                            <div class="flex flex-col gap-2 justify-center mt-8 sm:mt-10 mb-8 sm:mb-10">
+                                <div id="sag_on_camurluk" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-tr-[2rem] rounded-br-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sag_on_camurluk')">Sağ Ön<br>Çam.</div>
+                                <div id="sag_on_kapi" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sag_on_kapi')">Sağ Ön<br>Kapı</div>
+                                <div id="sag_arka_kapi" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sag_arka_kapi')">Sağ Arka<br>Kapı</div>
+                                <div id="sag_arka_camurluk" class="parca bg-slate-200 w-16 h-20 sm:w-20 sm:h-24 rounded-br-[2rem] rounded-tr-lg shadow-sm border-2 border-white cursor-pointer flex items-center justify-center text-center text-[10px] sm:text-xs font-bold text-slate-600" onclick="parcaTikla('sag_arka_camurluk')">Sağ Arka<br>Çam.</div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center items-center gap-6 mb-8 text-sm font-semibold text-slate-700">
+                            <div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-slate-200 border border-slate-300"></div> Orijinal</div>
+                            <div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-yellow-400 shadow-sm"></div> Boyalı</div>
+                            <div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-red-500 shadow-sm"></div> Değişmiş</div>
+                        </div>
+
+                        <label class="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition mb-6">
+                            <input type="checkbox" id="tamami_orijinal" class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" checked onchange="tamamiOrijinalTetikle()">
+                            <span class="font-bold text-slate-800">Tamamı Orijinal (Hatasız)</span>
+                        </label>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-slate-600">Tramer (Hasar Kaydı) Tutarı</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-turkish-lira-sign text-slate-400"></i></div>
+                                <input type="number" id="tramer" placeholder="Örn: 15000 (Yoksa 0 yazın)" class="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-4 mt-8">
+                            <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition-all"><i class="fa-solid fa-arrow-left mr-2"></i> Geri</button>
+                            <button type="button" onclick="nextStep(3)" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all">Sonraki Adım <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="step4" class="step-container">
+                        <h3 class="text-2xl font-bold mb-6 text-slate-800">İletişim Bilgileri</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Ad Soyad</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-user text-slate-400"></i></div>
+                                    <input type="text" id="ad_soyad" placeholder="Adınız Soyadınız" class="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-600">Cep Telefonu</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-phone text-slate-400"></i></div>
+                                    <input type="tel" id="telefon" placeholder="Örn: 05554443322" class="w-full pl-10 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-4 mt-6 mb-2 text-left bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" id="kvkk_onay" required class="mt-1 w-5 h-5 text-slate-800 bg-white border-gray-300 rounded focus:ring-slate-800 focus:ring-2 cursor-pointer transition-colors">
+                                <span class="text-sm text-gray-600 leading-relaxed group-hover:text-gray-800 transition-colors">
+                                    Kişisel verilerimin elde edilmesine, saklanmasına ve <a href="javascript:void(0)" onclick="metinModalGoster('aydinlatma')" class="text-slate-800 font-semibold underline hover:text-blue-600">Aydınlatma Metni</a>’nde belirtildiği şekilde işlenmesine, aydınlatılmış açık rızam ile onay veriyorum.
+                                </span>
+                            </label>
+
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <input type="checkbox" id="iletisim_onay" required class="mt-1 w-5 h-5 text-slate-800 bg-white border-gray-300 rounded focus:ring-slate-800 focus:ring-2 cursor-pointer transition-colors">
+                                <span class="text-sm text-gray-600 leading-relaxed group-hover:text-gray-800 transition-colors">
+                                    Otonex.com’un Al/Sat güncel fiyat teklifleri, hizmet ve kampanyaları ile ilgili duyurularından <strong class="text-slate-800">SMS ve TELEFON</strong> yoluyla haberdar olmak istiyorum.
+                                </span>
+                            </label>
+
+                        </div>
+
+                        <div class="flex space-x-4 mt-8">
+                            <button type="button" onclick="prevStep(4)" class="w-1/3 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition-all"><i class="fa-solid fa-arrow-left mr-2"></i> Geri</button>
+                            <button type="submit" class="w-2/3 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-500/30 transition-all text-lg"><i class="fa-solid fa-paper-plane mr-2"></i> Teklif Al</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="sonucMesaji" class="mt-8 text-center hidden py-10">
+                    <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-check text-4xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-slate-800 mb-3">Talebiniz Alındı!</h3>
+                    <p class="text-slate-500 text-lg">Uzmanlarımız aracınızı inceliyor. En kısa sürede size harika bir teklifle döneceğiz.</p>
+                    <button onclick="location.reload()" class="mt-8 bg-slate-100 text-slate-700 font-bold py-3 px-8 rounded-xl hover:bg-slate-200 transition"><i class="fa-solid fa-rotate-right mr-2"></i> Yeni İşlem Yap</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="metinModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl relative border border-slate-100">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                <h2 id="metinModalBaslik" class="text-xl font-bold text-slate-800"></h2>
+                <button onclick="metinModalKapat()" class="text-gray-400 hover:text-red-500 font-bold text-xl px-2 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="metinModalIcerik" class="p-6 sm:p-8 overflow-y-auto text-slate-600 text-sm leading-relaxed whitespace-pre-line">
+            </div>
+            <div class="p-5 bg-gray-50 border-t border-gray-100 flex justify-end rounded-b-2xl">
+                <button onclick="metinModalKapat()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-sm">Anladım, Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detayModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 transition-opacity">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[95vh] overflow-y-auto shadow-2xl relative border border-slate-100">
+            <button onclick="modalKapat()" class="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 font-bold text-xl shadow-md w-10 h-10 flex items-center justify-center z-10 transition"><i class="fa-solid fa-xmark"></i></button>
+            <div class="relative">
+                <img id="modalResim" src="" class="w-full h-56 sm:h-72 object-cover bg-slate-100">
+                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <h2 id="modalBaslik" class="absolute bottom-4 left-6 text-3xl sm:text-4xl font-extrabold text-white drop-shadow-md"></h2>
+            </div>
+            <div class="p-6 sm:p-8">
+                <div class="mb-6 flex justify-between items-end border-b border-slate-100 pb-5">
+                    <div>
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Satış Fiyatı</p>
+                        <span id="modalFiyat" class="text-3xl sm:text-4xl font-black text-blue-600"></span>
+                    </div>
+                    <span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> Ekspertizli</span>
+                </div>
+                <div class="grid grid-cols-2 gap-y-6 gap-x-6 text-sm sm:text-base">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><i class="fa-regular fa-calendar text-lg"></i></div> <div class="flex flex-col"><span class="font-bold text-slate-400 text-[11px] uppercase">Model Yılı</span> <span id="modalYil" class="font-bold text-slate-800"></span></div></div>
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><i class="fa-solid fa-gauge text-lg"></i></div> <div class="flex flex-col"><span class="font-bold text-slate-400 text-[11px] uppercase">Kilometre</span> <span id="modalKm" class="font-bold text-slate-800"></span></div></div>
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><i class="fa-solid fa-gas-pump text-lg"></i></div> <div class="flex flex-col"><span class="font-bold text-slate-400 text-[11px] uppercase">Yakıt Tipi</span> <span id="modalYakit" class="font-bold text-slate-800"></span></div></div>
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><i class="fa-solid fa-gear text-lg"></i></div> <div class="flex flex-col"><span class="font-bold text-slate-400 text-[11px] uppercase">Şanzıman</span> <span id="modalSanziman" class="font-bold text-slate-800"></span></div></div>
+                    <div class="col-span-2 bg-slate-50 p-4 rounded-2xl flex items-start gap-3"><i class="fa-solid fa-list-check text-blue-500 mt-1 text-lg"></i> <div class="flex flex-col"><span class="font-bold text-slate-400 text-[11px] uppercase">Donanım Özellikleri</span> <span id="modalDonanim" class="font-semibold text-slate-700 mt-1 leading-relaxed"></span></div></div>
+                    <div class="col-span-2 bg-red-50 p-4 rounded-2xl border border-red-100 flex items-start gap-3"><i class="fa-solid fa-triangle-exclamation text-red-500 mt-1 text-lg"></i> <div class="flex flex-col"><span class="font-bold text-red-400 text-[11px] uppercase">Ekspertiz & Hasar Durumu</span> <span id="modalHasar" class="font-bold text-red-700 mt-1"></span></div></div>
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <button onclick="modalKapat(); metinModalGoster('iletisim')" class="bg-blue-600 text-white font-bold py-4 px-10 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all w-full sm:w-auto text-center text-lg"><i class="fa-solid fa-phone mr-2"></i> Hemen İletişime Geç</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- HASAR ŞEMASI JS MANTIĞI ---
+        let hasarDurumlari = {
+            sol_on_camurluk: 0, sol_on_kapi: 0, sol_arka_kapi: 0, sol_arka_camurluk: 0,
+            on_tampon: 0, kaput: 0, tavan: 0, bagaj: 0, arka_tampon: 0,
+            sag_on_camurluk: 0, sag_on_kapi: 0, sag_arka_kapi: 0, sag_arka_camurluk: 0
+        };
+
+        const renkSınıfları = ['bg-slate-200', 'bg-yellow-400', 'bg-red-500'];
+        const yaziSınıfları = ['text-slate-600', 'text-slate-800', 'text-white'];
+
+        function parcaTikla(parcaId) {
+            hasarDurumlari[parcaId] = (hasarDurumlari[parcaId] + 1) % 3;
+            document.getElementById('tamami_orijinal').checked = false;
+            gorseliGuncelle();
+        }
+
+        function tamamiOrijinalTetikle() {
+            if(document.getElementById('tamami_orijinal').checked) {
+                for (let key in hasarDurumlari) hasarDurumlari[key] = 0;
+                gorseliGuncelle();
+            }
+        }
+
+        function gorseliGuncelle() {
+            for (let parca in hasarDurumlari) {
+                let element = document.getElementById(parca);
+                let durum = hasarDurumlari[parca];
+                element.classList.remove(...renkSınıfları, ...yaziSınıfları);
+                element.classList.add(renkSınıfları[durum], yaziSınıfları[durum]);
+            }
+        }
+
+        function ekspertizOzetCikar() {
+            if (document.getElementById('tamami_orijinal').checked) return "Hatasız / Tamamı Orijinal";
+            let boyalilar = []; let degisenler = [];
+            for (let parca in hasarDurumlari) {
+                if (hasarDurumlari[parca] === 1) boyalilar.push(document.getElementById(parca).innerText.replace(/\n/g, ' '));
+                if (hasarDurumlari[parca] === 2) degisenler.push(document.getElementById(parca).innerText.replace(/\n/g, ' '));
+            }
+            let ozet = [];
+            if (boyalilar.length > 0) ozet.push("Boyalı: " + boyalilar.join(', '));
+            if (degisenler.length > 0) ozet.push("Değişen: " + degisenler.join(', '));
+            return ozet.length === 0 ? "Hatasız / Tamamı Orijinal" : ozet.join(' | ');
+        }
+
+        // --- YENİ: METİN MODAL YÖNETİMİ ---
+        const modalMetinleri = {
+            'hakkimizda': {
+                baslik: 'Hakkımızda',
+                icerik: `Otonex, ikinci el araç alım ve satım süreçlerini modern, güvenilir ve şeffaf bir yapıyla yönetmek amacıyla kurulmuş yenilikçi bir otomotiv platformudur. Otomotiv sektöründeki deneyimimizi dijital teknolojilerle birleştirerek araç sahipleri ve alıcılar için hızlı, güvenli ve verimli bir ticaret ortamı sunmayı hedefliyoruz.
+
+Araç alım ve satım süreçlerinin çoğu zaman karmaşık, zaman alıcı ve güven sorunlarına açık olabildiğinin bilinciyle hareket eden Otonex, bu süreci daha kolay, hızlı ve güvenilir hale getirmek için faaliyet göstermektedir. Platformumuz aracılığıyla kullanıcılar, araç bilgilerini paylaşarak kısa sürede fiyat teklifi alabilir, ekspertiz süreçlerini planlayabilir ve satış işlemlerini profesyonel bir sistem üzerinden güvenle gerçekleştirebilir.
+
+Otonex olarak temel önceliğimiz; şeffaflık, güven ve müşteri memnuniyetidir. Tüm süreçlerimizde doğru fiyatlandırma, güvenilir işlem altyapısı ve profesyonel hizmet anlayışı ile müşterilerimize en iyi deneyimi sunmayı amaçlıyoruz.
+
+Otomotiv sektöründeki gelişmeleri yakından takip eden yapımız ve müşteri odaklı yaklaşımımız ile araç alım satım işlemlerini daha erişilebilir ve güvenilir bir hale getiriyoruz. Amacımız, kullanıcılarımızın araçlarını en doğru piyasa değeriyle değerlendirebilecekleri ve güvenle araç satın alabilecekleri güçlü bir platform oluşturmaktır.
+
+Otonex, otomotiv ticaretinde güven, şeffaflık ve profesyonelliği bir araya getirerek sektörde sürdürülebilir ve güçlü bir marka olma vizyonuyla faaliyetlerini sürdürmektedir.
+
+Vizyonumuz
+Otonex olarak vizyonumuz; otomotiv sektöründe güven, şeffaflık ve teknoloji odaklı yaklaşımı bir araya getirerek ikinci el araç alım ve satım süreçlerinde kullanıcıların ilk tercih ettiği güvenilir platformlardan biri olmaktır.
+
+Gelişen teknolojiyi yakından takip ederek araç ticaretini daha hızlı, daha güvenli ve daha erişilebilir hale getirmeyi hedefliyoruz. Uzun vadede otomotiv ticaretinde yenilikçi çözümler sunan güçlü ve sürdürülebilir bir marka olmayı amaçlıyoruz.
+
+Misyonumuz
+Misyonumuz; araç alım ve satım süreçlerini müşterilerimiz için kolay, hızlı ve güvenilir bir hale getirmektir.
+
+Profesyonel hizmet anlayışımızla araç sahiplerinin araçlarını doğru piyasa değeriyle değerlendirebilecekleri, alıcıların ise güvenle araç satın alabilecekleri şeffaf bir ticaret ortamı sunmayı hedefliyoruz.
+
+Müşteri memnuniyetini merkeze alan yaklaşımımızla otomotiv ticaretinde güvenilir bir çözüm ortağı olmayı amaçlıyoruz.
+
+Neden Otonex?
+• Güvenilir Ticaret: Araç alım ve satım süreçlerinde şeffaf ve güvenilir işlem anlayışı sunuyoruz.
+• Doğru Fiyatlandırma: Araçlar piyasa koşulları ve ekspertiz süreçleri doğrultusunda doğru şekilde değerlendirilir.
+• Hızlı İşlem Süreci: Araç sahipleri kısa sürede fiyat teklifi alabilir ve satış işlemlerini hızlı bir şekilde tamamlayabilir.
+• Profesyonel Hizmet: Otomotiv sektöründeki deneyimimiz ile müşterilerimize profesyonel ve kaliteli hizmet sunuyoruz.
+• Müşteri Memnuniyeti: Tüm süreçlerimizde müşteri memnuniyetini ön planda tutuyor ve sürdürülebilir bir hizmet anlayışı benimsiyoruz.`
+            },
+            'iletisim': {
+                baslik: 'İletişim Bilgileri',
+                icerik: `Bize aşağıdaki iletişim numaralarından ve e-posta adresinden ulaşabilirsiniz.
+
+HALİL İBRAHİM KURTARIR
+📞 0538 055 07 80
+
+MUSTAFA KURTARIR
+📞 0507 428 04 67
+
+CİHAN KILINÇ
+📞 0534 604 30 47
+
+✉️ E-Posta: otonexarac@gmail.com`
+            },
+            'aydinlatma': {
+                baslik: 'KİŞİSEL VERİLERİN KORUNMASI AYDINLATMA METNİ',
+                icerik: `(Otonex Uygulaması)
+
+İşbu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu’nun (“KVKK”) 10. maddesi ile Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ kapsamında veri sorumlusu sıfatıyla Kurtarır Auto (Otonex) tarafından hazırlanmıştır.
+
+Şirketimiz; sahibi olduğu Otonex.com alan adlı internet sitesi üzerinden araç alım ve satım hizmetlerinden yararlanmak amacıyla teklif formunu dolduran, fiyat teklifi alan veya şirketimizi telefonla arayan ziyaretçi, üye ve müşteriler ile tüzel kişi yetkililerinin paylaşmış olduğu aşağıdaki kişisel verileri işlemektedir:
+• Kimlik bilgileri: Ad, soyad, T.C. kimlik numarası
+• İletişim bilgileri: E-posta adresi, cep telefonu numarası, bulunduğu il bilgisi
+• Finansal bilgiler: IBAN bilgisi, ödeme ve banka bilgileri
+• Ses kayıtları: Çağrı merkezi görüşmelerine ait ses kayıtları
+• Araç bilgileri: Araç plakası, araç fotoğrafları, motor ve şasi numarası, ruhsat bilgileri, araç konum bilgisi, ekspertiz randevu bilgileri
+• Web sitesi kullanım bilgileri: IP adresi, çerez (cookie) kayıtları, izin/onay kayıtları, gezinme kayıtları ve log bilgileri
+
+Bu kişisel veriler;
+a) Muhatap olunan kişiye doğru hitap edilebilmesi, bilgilerin doğrulanması ve iletişim faaliyetlerinin yürütülmesi,
+b) Fiyat tekliflerinin verilmesi, cep telefonuna doğrulama/onay kodu gönderilmesi, teklif sonrası ekspertiz randevu süreçlerinin takibi ve yönetimi, araç satışı gerçekleşmesi halinde sözleşmeden doğan yükümlülüklerin yerine getirilmesi ve teklif sayısı sınırlamalarına ilişkin kontrollerin yapılması,
+c) Müşteri memnuniyetinin ölçülmesi, müşteri şikâyetlerinin takibi ve giderilmesi ile hizmet süreçlerinin iyileştirilmesi,
+d) İdari işler ve müşteri ilişkileri yönetimi süreçlerinin yürütülmesi,
+e) Ürün ve hizmetlere ilişkin pazarlama, reklam, kampanya ve promosyon bilgilendirmelerinin yapılması,
+f) Yasal yükümlülüklerin yerine getirilmesi,
+g) Doğabilecek hukuki uyuşmazlıklarda delil olarak kullanılabilmesi
+amaçlarıyla sınırlı olarak işlenmektedir.
+
+Kişisel Verilerin Aktarılması
+Kişisel verileriniz aşağıda belirtilen amaçlar doğrultusunda ilgili kişi ve kurumlara aktarılabilmektedir:
+• Oto Ekspertiz Kuruluşları: Araç plakası bilgisi, ekspertiz randevusu oluşturulması amacıyla paylaşılmaktadır.
+• Sigorta Bilgi ve Gözetim Merkezi (SBM): Araç şasi numarası, araç geçmişi ve Tramer sorgusu yapılması amacıyla SBM sistemleri üzerinden aktarılmaktadır.
+• Ticari Elektronik İleti Hizmet Sağlayıcıları: Cep telefonu numarası, doğrulama kodu gönderimi, randevu bilgilendirmesi ve müşteri memnuniyeti ölçümü amacıyla paylaşılmaktadır.
+• Çağrı Merkezi Hizmet Sağlayıcıları: Telefon görüşmelerinin kayıt altına alınması amacıyla ilgili hizmet sağlayıcıya aktarılmaktadır.
+• Adli makamlar ve kolluk kuvvetleri: Hukuki yükümlülükler kapsamında talep edilmesi halinde ilgili kurum ve kuruluşlara aktarılabilmektedir.
+
+Kişisel Verilerin İşlenme Hukuki Sebepleri
+Kişisel verileriniz, KVKK’nın 5. maddesinde yer alan aşağıdaki hukuki sebeplere dayanarak işlenmektedir:
+• Açık rıza: Pazarlama, reklam, kampanya ve promosyon içerikli elektronik iletilerin gönderilmesi.
+• Sözleşmenin kurulması veya ifası: Fiyat teklifi verilmesi, doğrulama kodu gönderilmesi, ekspertiz randevu süreçlerinin yürütülmesi ve araç satış işlemlerinin gerçekleştirilmesi.
+• Hukuki yükümlülük: Mevzuattan doğan yükümlülüklerin yerine getirilmesi.
+• Meşru menfaat: İletişim faaliyetlerinin yürütülmesi, müşteri memnuniyeti ölçümü, müşteri ilişkileri yönetimi ve olası hukuki uyuşmazlıklarda delil olarak kullanılabilmesi.
+
+KVKK Kapsamındaki Haklarınız
+KVKK’nın 11. maddesi uyarınca veri sahipleri olarak;
+• Kişisel verilerinizin işlenip işlenmediğini öğrenme
+• İşlenmişse buna ilişkin bilgi talep etme
+• İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme
+• Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme
+• Eksik veya yanlış işlenmiş verilerin düzeltilmesini isteme
+• KVKK’nın 7. maddesi kapsamında silinmesini veya yok edilmesini talep etme
+• Bu işlemlerin verilerin aktarıldığı üçüncü kişilere bildirilmesini isteme
+• Otomatik sistemler ile analiz edilmesi sonucu aleyhinize bir sonuç çıkmasına itiraz etme
+• Kanuna aykırı işleme nedeniyle zarara uğramanız halinde zararın giderilmesini talep etme
+haklarına sahipsiniz.
+
+Bu kapsamda taleplerinizi, Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ uyarınca aşağıdaki iletişim kanalları üzerinden şirketimize iletebilirsiniz.
+
+Veri Sorumlusu İletişim Bilgileri
+Kurtarır Auto – Otonex
+Adres: Mavikent Mahallesi 135015 Nolu Cadde No:8/C Galericiler Sitesi Şahinbey / Gaziantep
+E-posta: otonexarac@gmail.com
+Web sitesi: Otonex.com
+MERSİS No: (Şirketinizin resmi MERSİS numarası yazılacaktır.)`
+            }
+        };
+
+        function metinModalGoster(tur) {
+            document.getElementById('metinModalBaslik').innerText = modalMetinleri[tur].baslik;
+            document.getElementById('metinModalIcerik').innerText = modalMetinleri[tur].icerik;
+            document.getElementById('metinModal').classList.remove('hidden');
+        }
+
+        function metinModalKapat() {
+            document.getElementById('metinModal').classList.add('hidden');
+        }
+
+        // --- VİTRİN VE MODAL YÖNETİMİ ---
+        let globalVitrinIlanlari = []; 
+
+        function anaSekmeDegistir(sekme) {
+            const btnAl = document.getElementById('tab-al'); const btnSat = document.getElementById('tab-sat');
+            const bolumVitrin = document.getElementById('vitrin-bolumu'); const bolumDegerleme = document.getElementById('degerleme-bolumu');
+            if (sekme === 'al') {
+                bolumVitrin.classList.remove('hidden'); bolumDegerleme.classList.add('hidden'); bolumDegerleme.classList.remove('flex');
+                btnAl.className = "w-1/2 py-3.5 rounded-xl font-bold bg-white text-blue-600 shadow-sm transition-all duration-300 text-[15px] flex items-center justify-center gap-2";
+                btnSat.className = "w-1/2 py-3.5 rounded-xl font-bold text-slate-500 hover:text-slate-700 transition-all duration-300 text-[15px] flex items-center justify-center gap-2";
+                vitrinIlanlariniGetir();
+            } else {
+                bolumVitrin.classList.add('hidden'); bolumDegerleme.classList.remove('hidden'); bolumDegerleme.classList.add('flex');
+                btnSat.className = "w-1/2 py-3.5 rounded-xl font-bold bg-white text-blue-600 shadow-sm transition-all duration-300 text-[15px] flex items-center justify-center gap-2";
+                btnAl.className = "w-1/2 py-3.5 rounded-xl font-bold text-slate-500 hover:text-slate-700 transition-all duration-300 text-[15px] flex items-center justify-center gap-2";
+            }
+        }
+
+        async function vitrinIlanlariniGetir() {
+            const liste = document.getElementById('musteriIlanListesi');
+            try {
+                const response = await fetch('/api/ilanlar');
+                const ilanlar = await response.json();
+                globalVitrinIlanlari = ilanlar; 
+                if(ilanlar.length === 0) {
+                    liste.innerHTML = '<div class="col-span-full text-center py-16 text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-sm"><i class="fa-solid fa-car-side text-4xl mb-3 text-slate-300"></i><p class="font-medium text-lg">Şu anda güncel ilanımız bulunmamaktadır.</p></div>'; return;
+                }
+                liste.innerHTML = ilanlar.map(ilan => `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group cursor-pointer" onclick="ilanDetayGoster(${ilan.id})">
+                        <div class="relative h-56 overflow-hidden bg-slate-100">
+                            <img src="${ilan.resim_url || 'https://via.placeholder.com/400x250?text=Otonex+Ara%C3%A7'}" alt="${ilan.marka}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur text-slate-800 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm">${ilan.yil}</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-slate-800 mb-1 truncate">${ilan.marka} ${ilan.model}</h3>
+                            <div class="flex items-center gap-4 text-sm text-slate-500 mb-5 font-medium">
+                                <span><i class="fa-solid fa-gauge text-slate-400 mr-1"></i> ${Number(ilan.kilometre).toLocaleString('tr-TR')} KM</span>
+                                <span><i class="fa-solid fa-gas-pump text-slate-400 mr-1"></i> ${ilan.yakit || 'Bilinmiyor'}</span>
+                            </div>
+                            <div class="flex justify-between items-center border-t border-slate-100 pt-4 mt-2">
+                                <span class="text-2xl font-black text-blue-600 tracking-tight">${ilan.fiyat}</span>
+                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fa-solid fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { liste.innerHTML = '<div class="col-span-full text-center py-10 text-red-500"><i class="fa-solid fa-circle-exclamation text-2xl mb-2 block"></i> İlanlar yüklenirken bir hata oluştu.</div>'; }
+        }
+
+        function ilanDetayGoster(id) {
+            const arac = globalVitrinIlanlari.find(i => i.id === id); if(!arac) return;
+            document.getElementById('modalResim').src = arac.resim_url || 'https://via.placeholder.com/800x400';
+            document.getElementById('modalBaslik').innerText = arac.marka + ' ' + arac.model;
+            document.getElementById('modalFiyat').innerText = arac.fiyat;
+            document.getElementById('modalYil').innerText = arac.yil;
+            document.getElementById('modalKm').innerText = Number(arac.kilometre).toLocaleString('tr-TR') + ' KM';
+            document.getElementById('modalYakit').innerText = arac.yakit || 'Belirtilmemiş';
+            document.getElementById('modalSanziman').innerText = arac.sanziman || 'Belirtilmemiş';
+            document.getElementById('modalDonanim').innerText = arac.donanim || 'Belirtilmemiş';
+            document.getElementById('modalHasar').innerText = arac.hasar_durumu || 'Belirtilmemiş';
+            document.getElementById('detayModal').classList.remove('hidden');
+        }
+        function modalKapat() { document.getElementById('detayModal').classList.add('hidden'); }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            vitrinIlanlariniGetir(); 
+            gorseliGuncelle(); 
+            
+            const yilSelect = document.getElementById('yil');
+            const currentYear = new Date().getFullYear();
+            for (let i = currentYear; i >= 1980; i--) {
+                yilSelect.add(new Option(i, i));
+            }
+            yilSelect.add(new Option("Daha Eski", "Daha Eski"));
+        });
+
+        const aracDetaylari = {
+            "Audi": {
+                "A3": { motorlar: ["30 TDI (1.6)", "35 TFSI (1.5)", "1.0 TFSI", "1.5 TFSI", "1.6 TDI", "1.4 TFSI", "2.0 TDI"], paketler: ["Advanced", "S Line", "Design", "Sport", "Dynamic", "Attraction"] },
+                "A4": { motorlar: ["40 TDI (2.0)", "45 TFSI (2.0)", "2.0 TDI", "1.4 TFSI", "1.8 TFSI"], paketler: ["Advanced", "S Line", "Design", "Sport"] },
+                "A5": { motorlar: ["40 TDI", "45 TFSI", "2.0 TDI", "1.4 TFSI"], paketler: ["Design", "S Line", "Sport"] },
+                "A6": { motorlar: ["40 TDI (2.0)", "45 Turbo FSI", "50 TDI (3.0)", "2.0 TDI"], paketler: ["Design", "Sport", "S Line", "Quattro"] },
+                "Q2": { motorlar: ["30 TDI (1.6)", "35 TFSI (1.5)", "1.0 TFSI", "1.4 TFSI"], paketler: ["Design", "Sport", "Advanced", "S Line"] },
+                "Q3": { motorlar: ["35 TFSI (1.5)", "1.4 TFSI", "2.0 TDI"], paketler: ["Advanced", "S Line"] },
+                "Q5": { motorlar: ["40 TDI (2.0)", "2.0 TDI", "2.0 TFSI"], paketler: ["Advanced", "S Line", "Design"] },
+                "Q7": { motorlar: ["50 TDI (3.0)", "3.0 TDI Quattro"], paketler: ["S Line"] }
+            },
+            "BMW": {
+                "1 Serisi": { motorlar: ["118i (1.5)", "116d (1.5)", "116i (1.5)", "120i (1.6)"], paketler: ["Sport Line", "Luxury Line", "M Sport", "Joy", "Premium"] },
+                "2 Serisi": { motorlar: ["218i (1.5)", "216d (1.5)"], paketler: ["Sport Line", "Luxury Line", "M Sport"] },
+                "3 Serisi": { motorlar: ["320i ED (1.6)", "320i (2.0)", "320d (2.0)", "330e", "318i (1.5)"], paketler: ["Sport Line", "Luxury Line", "M Sport", "Edition M Sport"] },
+                "4 Serisi": { motorlar: ["420i (2.0)", "420d (2.0)", "430i (2.0)"], paketler: ["M Sport", "Luxury Line", "Edition M Sport"] },
+                "5 Serisi": { motorlar: ["520i (1.6)", "520d (2.0)", "530i (2.0)", "525d (2.0)", "530d (3.0)"], paketler: ["Executive", "Prestige", "M Sport", "Luxury Line", "Special Edition"] },
+                "X1": { motorlar: ["sDrive18i (1.5)", "sDrive16d (1.5)"], paketler: ["X-Line", "M Sport", "Joy"] },
+                "X3": { motorlar: ["sDrive20i (1.6)", "xDrive20d (2.0)", "xDrive30i (2.0)"], paketler: ["X-Line", "M Sport", "Luxury Line"] },
+                "X5": { motorlar: ["xDrive30d (3.0)", "xDrive40i (3.0)", "xDrive25d (2.0)"], paketler: ["X-Line", "M Sport"] }
+            },
+            "Citroen": {
+                "C3": { motorlar: ["1.2 PureTech", "1.4 HDi", "1.6 BlueHDi", "1.5 BlueHDi"], paketler: ["Feel", "Feel Bold", "Shine", "Shine Business"] },
+                "C3 Aircross": { motorlar: ["1.2 PureTech", "1.5 BlueHDi", "1.6 BlueHDi"], paketler: ["Feel", "Feel Bold", "Shine"] },
+                "C4": { motorlar: ["1.2 PureTech", "1.5 BlueHDi", "e-C4 (Elektrik)"], paketler: ["Feel", "Feel Bold", "Shine", "Shine Bold"] },
+                "C5 Aircross": { motorlar: ["1.5 BlueHDi", "1.6 PureTech", "1.2 PureTech"], paketler: ["Feel", "Feel Bold", "Shine", "Shine Bold"] },
+                "Berlingo": { motorlar: ["1.5 BlueHDi", "1.6 BlueHDi"], paketler: ["Feel", "Feel Bold", "Shine", "Shine Bold"] }
+            },
+            "Dacia": {
+                "Duster": { motorlar: ["1.0 TCe", "1.3 TCe", "1.5 Blue dCi", "1.5 dCi", "1.0 TCe ECO-G (LPG)"], paketler: ["Comfort", "Prestige", "Prestige Plus", "Journey", "Extreme", "Essential"] },
+                "Sandero": { motorlar: ["1.0 Sce", "1.0 TCe", "1.0 TCe ECO-G", "0.9 TCe", "1.5 dCi"], paketler: ["Stepway", "Comfort", "Prestige", "Essential"] },
+                "Logan": { motorlar: ["1.0 Sce", "1.5 dCi"], paketler: ["Ambiance", "Laureate"] }
+            },
+            "Fiat": {
+                "Egea": { motorlar: ["1.4 Fire", "1.3 Multijet", "1.6 Multijet", "1.5 T4 Hibrit"], paketler: ["Easy", "Urban", "Lounge", "Cross", "Street", "Mirror"] },
+                "Fiorino": { motorlar: ["1.3 Multijet", "1.4 Fire", "1.4 Eco (LPG)"], paketler: ["Pop", "Safeline", "Premio", "Trekking"] },
+                "Doblo": { motorlar: ["1.3 Multijet", "1.6 Multijet", "1.9 JTD"], paketler: ["Easy", "Urban", "Premio", "Premio Plus", "Trekking"] },
+                "Linea": { motorlar: ["1.3 Multijet", "1.6 Multijet", "1.4 Fire"], paketler: ["Active Plus", "Via", "Urban", "Lounge", "Actual"] },
+                "500": { motorlar: ["1.0 Hybrid", "1.2 Fire", "Elektrikli (500e)"], paketler: ["Cult", "Dolcevita", "Lounge", "La Prima"] }
+            },
+            "Ford": {
+                "Focus": { motorlar: ["1.5 Ti-VCT", "1.0 EcoBoost", "1.5 EcoBlue", "1.6 TDCi", "1.6 Ti-VCT"], paketler: ["Trend X", "Titanium", "ST-Line", "Active", "Ghia"] },
+                "Fiesta": { motorlar: ["1.0 EcoBoost", "1.1L", "1.5 TDCi", "1.4 TDCi", "1.25i"], paketler: ["Trend", "Titanium", "ST-Line"] },
+                "Courier": { motorlar: ["1.5 TDCi", "1.6 TDCi", "1.0 EcoBoost"], paketler: ["Trend", "Deluxe", "Titanium", "Blackline", "Colorline"] },
+                "Kuga": { motorlar: ["1.5 EcoBoost", "1.5 EcoBlue", "2.0 TDCi"], paketler: ["Style", "Titanium", "ST-Line"] },
+                "Puma": { motorlar: ["1.0 EcoBoost", "1.0 EcoBoost mHEV"], paketler: ["Style", "ST-Line", "ST-Line X"] }
+            },
+            "Honda": {
+                "Civic": { motorlar: ["1.5 VTEC Turbo", "1.6 i-DTEC", "1.6 i-VTEC ECO", "1.6 i-VTEC"], paketler: ["Elegance", "Executive", "Executive+", "Dream", "Premium"] },
+                "CR-V": { motorlar: ["1.5 VTEC Turbo", "2.0 i-MMD Hybrid", "1.6 i-DTEC", "2.0 i-VTEC"], paketler: ["Elegance", "Executive", "Executive+"] },
+                "City": { motorlar: ["1.5 i-VTEC"], paketler: ["Elegance", "Executive"] },
+                "HR-V": { motorlar: ["1.5 i-VTEC", "1.5 e:HEV Hybrid", "1.6 i-DTEC"], paketler: ["Elegance", "Advance", "Executive"] }
+            },
+            "Hyundai": {
+                "i20": { motorlar: ["1.4 MPI", "1.0 T-GDI", "1.2 MPI", "1.4 CRDi"], paketler: ["Jump", "Style", "Style Plus", "Elite", "Sense"] },
+                "i10": { motorlar: ["1.0 MPI", "1.2 MPI"], paketler: ["Jump", "Style", "Elite"] },
+                "Tucson": { motorlar: ["1.6 T-GDI", "1.6 CRDi", "1.6 T-GDI Hybrid", "2.0 CRDi"], paketler: ["Comfort", "Prime", "Elite", "Elite Plus", "N Line"] },
+                "Bayon": { motorlar: ["1.4 MPI", "1.0 T-GDI"], paketler: ["Jump", "Style", "Elite"] },
+                "Elantra": { motorlar: ["1.6 MPI"], paketler: ["Style", "Smart", "Elite"] }
+            },
+            "Kia": {
+                "Sportage": { motorlar: ["1.6 GDI", "1.6 T-GDI", "1.6 CRDi", "1.6 T-GDI Hybrid"], paketler: ["Cool", "Elegance", "Prestige", "Anniversary"] },
+                "Ceed": { motorlar: ["1.0 T-GDI", "1.4 T-GDI", "1.6 CRDi", "1.5 T-GDI"], paketler: ["Cool", "Elegance", "Concept Plus"] },
+                "Stonic": { motorlar: ["1.4 DPI", "1.0 T-GDI", "1.2 DPI"], paketler: ["Cool", "Elegance"] },
+                "Rio": { motorlar: ["1.2 DPI", "1.4 DPI", "1.4 CRDi"], paketler: ["Cool", "Elegance", "Prestige"] }
+            },
+            "Mercedes-Benz": {
+                "A-Serisi": { motorlar: ["A 200 (1.33)", "A 180 d (1.5)", "A 180 (1.33)", "A 180 CDI (1.5)"], paketler: ["Style", "Progressive", "AMG", "Urban"] },
+                "C-Serisi": { motorlar: ["C 200 4MATIC (1.5)", "C 200 d (1.6)", "C 180 (1.6)", "C 180 (1.5)", "C 220 d (2.0)"], paketler: ["Avantgarde", "Fascination", "AMG", "Exclusive", "Edition 1"] },
+                "E-Serisi": { motorlar: ["E 200 d (1.6)", "E 300 d (2.0)", "E 200 (2.0)", "E 180 (1.6)", "E 220 CDI (2.1)"], paketler: ["Avantgarde", "Exclusive", "AMG", "Edition E"] },
+                "CLA": { motorlar: ["CLA 200 (1.33)", "CLA 180 d (1.5)"], paketler: ["AMG", "Progressive"] },
+                "GLA": { motorlar: ["GLA 200", "GLA 180 d"], paketler: ["AMG", "Progressive"] }
+            },
+            "Nissan": {
+                "Qashqai": { motorlar: ["1.2 DIG-T", "1.3 DIG-T", "1.5 dCi", "1.6 dCi", "e-Power"], paketler: ["Visia", "Tekna", "Sky Pack", "Design Pack", "Platinum Premium"] },
+                "Micra": { motorlar: ["1.0 IG-T", "1.2", "1.5 dCi"], paketler: ["Visia", "Tekna", "Platinum"] },
+                "Juke": { motorlar: ["1.0 DIG-T", "1.2 DIG-T", "1.5 dCi"], paketler: ["Tekna", "Platinum"] },
+                "X-Trail": { motorlar: ["1.3 DIG-T", "1.6 dCi", "e-Power"], paketler: ["Design Pack", "Platinum"] }
+            },
+            "Opel": {
+                "Corsa": { motorlar: ["1.2", "1.2 Turbo", "1.4", "1.5 Dizel", "1.3 CDTI", "Elektrik (Corsa-e)"], paketler: ["Essential", "Edition", "Elegance", "Ultimate", "GS Line", "Color Edition"] },
+                "Astra": { motorlar: ["1.2 Turbo", "1.4 Turbo", "1.5 Dizel", "1.6 CDTI"], paketler: ["Edition", "Elegance", "GS Line", "Enjoy", "Excellence"] },
+                "Crossland": { motorlar: ["1.2 Turbo", "1.5 Dizel"], paketler: ["Essential", "Edition", "Elegance"] },
+                "Mokka": { motorlar: ["1.2 Turbo", "1.6 CDTI", "Elektrik (Mokka-e)"], paketler: ["Elegance", "GS", "Ultimate"] }
+            },
+            "Peugeot": {
+                "208": { motorlar: ["1.2 PureTech", "1.5 BlueHDi", "1.4 HDi", "e-208 (Elektrik)"], paketler: ["Active", "Allure", "GT", "Prime", "Access"] },
+                "308": { motorlar: ["1.2 PureTech", "1.5 BlueHDi", "1.6 e-HDi"], paketler: ["Active", "Allure", "GT Line", "GT"] },
+                "2008": { motorlar: ["1.2 PureTech", "1.5 BlueHDi", "1.6 e-HDi", "e-2008 (Elektrik)"], paketler: ["Active", "Allure", "GT Line", "GT"] },
+                "3008": { motorlar: ["1.2 PureTech", "1.6 PureTech", "1.5 BlueHDi", "1.6 BlueHDi"], paketler: ["Active", "Allure", "GT Line", "GT", "Allure Elegance"] },
+                "508": { motorlar: ["1.5 BlueHDi", "1.6 PureTech", "1.6 e-HDi"], paketler: ["Allure", "GT Line", "GT"] }
+            },
+            "Renault": {
+                "Megane": { motorlar: ["1.3 TCe", "1.5 Blue dCi", "1.6 16V", "1.5 dCi", "1.2 TCe"], paketler: ["Joy", "Touch", "Icon", "RS Line", "Expression", "Privilege"] },
+                "Clio": { motorlar: ["1.0 Sce", "1.0 TCe", "1.5 Blue dCi", "1.5 dCi", "1.2 16V", "0.9 TCe"], paketler: ["Joy", "Touch", "Icon", "Evolution", "Techno", "Extreme"] },
+                "Symbol": { motorlar: ["1.5 dCi", "0.9 TCe", "1.2 16V"], paketler: ["Joy", "Touch", "Authentique"] },
+                "Captur": { motorlar: ["1.0 TCe", "1.3 TCe", "1.5 dCi"], paketler: ["Joy", "Touch", "Icon", "RS Line"] },
+                "Taliant": { motorlar: ["1.0 Sce", "1.0 TCe", "1.0 TCe ECO-G"], paketler: ["Joy", "Touch"] }
+            },
+            "Seat": {
+                "Leon": { motorlar: ["1.0 eTSI", "1.5 eTSI", "1.0 TSI", "1.4 TSI", "1.6 TDI"], paketler: ["Style", "FR", "Xcellence"] },
+                "Ibiza": { motorlar: ["1.0 Evo", "1.0 TSI", "1.4 MPI"], paketler: ["Reference", "Style", "FR"] },
+                "Arona": { motorlar: ["1.0 TSI"], paketler: ["Style", "Xperience", "FR"] }
+            },
+            "Skoda": {
+                "Octavia": { motorlar: ["1.0 eTEC", "1.5 eTEC", "1.0 TSI", "1.6 TDI", "1.4 TSI"], paketler: ["Elite", "Premium", "Sportline", "Ambition", "Style", "Optimal"] },
+                "Superb": { motorlar: ["1.5 TSI", "2.0 TDI", "1.4 TSI", "1.6 TDI"], paketler: ["Elite", "Premium", "Prestige", "L&K Crystal"] },
+                "Scala": { motorlar: ["1.0 TSI", "1.5 TSI", "1.6 TDI"], paketler: ["Elite", "Premium"] },
+                "Kamiq": { motorlar: ["1.0 TSI", "1.5 TSI"], paketler: ["Elite", "Premium", "Monte Carlo"] }
+            },
+            "Toyota": {
+                "Corolla": { motorlar: ["1.5 Vision", "1.8 Hybrid", "1.6 Valvematic", "1.4 D-4D", "1.33 Dual VVT-i"], paketler: ["Vision", "Dream", "Flame", "Flame X-Pack", "Passion X-Pack", "Touch", "Advance", "Premium"] },
+                "Yaris": { motorlar: ["1.5 VVT-i", "1.5 Hybrid", "1.0 VVT-i", "1.33 VVT-i", "1.4 D-4D"], paketler: ["Vision", "Dream", "Flame", "Passion", "Cool", "Fun"] },
+                "C-HR": { motorlar: ["1.8 Hybrid", "1.2 Turbo"], paketler: ["Advance", "Dynamic", "Diamond"] },
+                "Auris": { motorlar: ["1.6 Valvematic", "1.4 D-4D", "1.33 Dual VVT-i", "1.8 Hybrid"], paketler: ["Active", "Advance", "Premium"] }
+            },
+            "Volkswagen": {
+                "Golf": { motorlar: ["1.0 eTSI", "1.5 eTSI", "1.0 TSI", "1.4 TSI", "1.6 TDI", "1.2 TSI"], paketler: ["Impression", "Life", "Style", "R-Line", "Midline Plus", "Comfortline", "Highline"] },
+                "Passat": { motorlar: ["1.5 TSI", "2.0 TDI", "1.4 TSI", "1.6 TDI", "1.8 TSI", "2.0 FSI"], paketler: ["Impression", "Business", "Elegance", "Trendline", "Comfortline", "Highline", "Variant"] },
+                "Polo": { motorlar: ["1.0 MPI", "1.0 TSI", "1.4 TDI", "1.2 TSI", "1.4", "1.6 TDI"], paketler: ["Impression", "Life", "Style", "Trendline", "Comfortline", "Highline"] },
+                "Tiguan": { motorlar: ["1.5 TSI", "2.0 TDI", "1.4 TSI"], paketler: ["Life", "Elegance", "R-Line", "Trendline", "Comfortline", "Highline"] },
+                "T-Roc": { motorlar: ["1.5 TSI"], paketler: ["Life", "Style", "R-Line", "Highline"] },
+                "Jetta": { motorlar: ["1.2 TSI", "1.4 TSI", "1.6 TDI"], paketler: ["Trendline", "Comfortline", "Highline"] }
+            },
+            "Volvo": {
+                "S60": { motorlar: ["B4", "B5", "T3", "D4", "T4", "1.6 D"], paketler: ["Inscription", "R-Design", "Plus", "Ultimate", "Advance", "Premium"] },
+                "XC90": { motorlar: ["B5", "B6", "Recharge T8", "D5"], paketler: ["Inscription", "R-Design", "Plus", "Ultimate", "Momentum"] },
+                "XC60": { motorlar: ["B4", "B5", "D4", "T5", "2.0 D"], paketler: ["Inscription", "R-Design", "Momentum"] },
+                "XC40": { motorlar: ["T3", "B4", "Recharge (Elektrik)"], paketler: ["Inscription", "R-Design", "Plus", "Ultimate"] }
+            }
+        };
+
+        document.getElementById('marka').addEventListener('change', function() {
+            const mSelect = document.getElementById('model'); const dInput = document.getElementById('diger_model');
+            const marka = this.value;
+            
+            mSelect.innerHTML = '<option value="">Seçiniz</option>';
+            document.getElementById('motor').innerHTML = '<option value="">Önce Model Seçiniz</option>';
+            document.getElementById('donanim').innerHTML = '<option value="">Önce Model Seçiniz</option>';
+            document.getElementById('diger_motor').classList.add('hidden'); document.getElementById('diger_donanim').classList.add('hidden');
+            
+            dInput.classList.add('hidden'); dInput.removeAttribute('required');
+            
+            if(marka === "Diğer") {
+                dInput.classList.remove('hidden'); dInput.setAttribute('required', 'true');
+                mSelect.innerHTML = '<option value="Diğer">Kendim Gireceğim</option>';
+                document.getElementById('motor').innerHTML = '<option value="Diğer">Kendim Gireceğim</option>';
+                document.getElementById('donanim').innerHTML = '<option value="Diğer">Kendim Gireceğim</option>';
+                document.getElementById('diger_motor').classList.remove('hidden'); document.getElementById('diger_motor').setAttribute('required', 'true');
+                document.getElementById('diger_donanim').classList.remove('hidden'); document.getElementById('diger_donanim').setAttribute('required', 'true');
+            } else if(marka && aracDetaylari[marka]) {
+                Object.keys(aracDetaylari[marka]).forEach(model => mSelect.innerHTML += `<option value="${model}">${model}</option>`);
+                mSelect.innerHTML += '<option value="Diğer" class="font-bold">Diğer</option>';
+            }
+        });
+
+        document.getElementById('model').addEventListener('change', function() {
+            const dInput = document.getElementById('diger_model');
+            const motorSelect = document.getElementById('motor');
+            const donanimSelect = document.getElementById('donanim');
+            const marka = document.getElementById('marka').value;
+            const model = this.value;
+
+            motorSelect.innerHTML = '<option value="">Seçiniz</option>';
+            donanimSelect.innerHTML = '<option value="">Seçiniz</option>';
+            document.getElementById('diger_motor').classList.add('hidden'); document.getElementById('diger_motor').removeAttribute('required');
+            document.getElementById('diger_donanim').classList.add('hidden'); document.getElementById('diger_donanim').removeAttribute('required');
+
+            if(model === "Diğer") { 
+                dInput.classList.remove('hidden'); dInput.setAttribute('required', 'true'); 
+                motorSelect.innerHTML = '<option value="Diğer">Kendim Gireceğim</option>';
+                donanimSelect.innerHTML = '<option value="Diğer">Kendim Gireceğim</option>';
+                document.getElementById('diger_motor').classList.remove('hidden'); document.getElementById('diger_motor').setAttribute('required', 'true');
+                document.getElementById('diger_donanim').classList.remove('hidden'); document.getElementById('diger_donanim').setAttribute('required', 'true');
+            } else { 
+                dInput.classList.add('hidden'); dInput.removeAttribute('required'); 
+                
+                if (marka && model && aracDetaylari[marka] && aracDetaylari[marka][model]) {
+                    const motorlar = aracDetaylari[marka][model].motorlar;
+                    const paketler = aracDetaylari[marka][model].paketler;
+
+                    motorlar.forEach(m => motorSelect.innerHTML += `<option value="${m}">${m}</option>`);
+                    motorSelect.innerHTML += '<option value="1.0">1.0</option><option value="1.2">1.2</option><option value="1.3">1.3</option><option value="1.4">1.4</option><option value="1.5">1.5</option><option value="1.6">1.6</option><option value="2.0">2.0</option>';
+                    motorSelect.innerHTML += '<option value="Diğer" class="font-bold">Diğer (Listede Yok)</option>';
+
+                    paketler.forEach(p => donanimSelect.innerHTML += `<option value="${p}">${p}</option>`);
+                    donanimSelect.innerHTML += '<option value="Boş Paket">Boş Paket</option><option value="Dolu Paket">Dolu Paket</option>';
+                    donanimSelect.innerHTML += '<option value="Diğer" class="font-bold">Diğer (Listede Yok)</option>';
+                }
+            }
+        });
+
+        document.getElementById('motor').addEventListener('change', function() {
+            const input = document.getElementById('diger_motor');
+            if(this.value === "Diğer") { input.classList.remove('hidden'); input.setAttribute('required', 'true'); } 
+            else { input.classList.add('hidden'); input.removeAttribute('required'); }
+        });
+
+        document.getElementById('donanim').addEventListener('change', function() {
+            const input = document.getElementById('diger_donanim');
+            if(this.value === "Diğer") { input.classList.remove('hidden'); input.setAttribute('required', 'true'); } 
+            else { input.classList.add('hidden'); input.removeAttribute('required'); }
+        });
+
+        function showStep(s) {
+            document.querySelectorAll('.step-container').forEach(e => e.classList.remove('active'));
+            document.getElementById('step' + s).classList.add('active');
+            document.getElementById('progressBar').style.width = (s * 25) + '%';
+            for(let i=1; i<=4; i++) {
+                let t = document.getElementById('step-text-' + i);
+                i <= s ? (t.classList.add('text-blue-600'), t.classList.remove('text-slate-300')) : (t.classList.remove('text-blue-600'), t.classList.add('text-slate-300'));
+            }
+        }
+
+        function validateStep(s) {
+            let valid = true;
+            document.getElementById('step' + s).querySelectorAll('input[required], select[required]').forEach(i => {
+                // Gizli inputları doğrulama dışı bırak
+                if(i.classList.contains('hidden')) return;
+                
+                if(!i.value.trim() && i.type !== 'checkbox') { 
+                    i.classList.add('ring-2', 'ring-red-500'); 
+                    valid = false; 
+                } else if (i.type === 'checkbox' && !i.checked) {
+                    i.classList.add('ring-2', 'ring-red-500');
+                    valid = false;
+                } else { 
+                    i.classList.remove('ring-2', 'ring-red-500'); 
+                }
+            });
+            return valid;
+        }
+
+        function nextStep(s) { if(validateStep(s)) showStep(s + 1); }
+        function prevStep(s) { showStep(s - 1); }
+
+        document.getElementById('degerlemeFormu').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if(!validateStep(4)) return;
+
+            let secilenModel = document.getElementById('model').value;
+            if(secilenModel === "Diğer" || document.getElementById('marka').value === "Diğer") secilenModel = document.getElementById('diger_model').value;
+
+            let secilenMotor = document.getElementById('motor').value;
+            if(secilenMotor === "Diğer") secilenMotor = document.getElementById('diger_motor').value;
+
+            let secilenDonanim = document.getElementById('donanim').value;
+            if(secilenDonanim === "Diğer") secilenDonanim = document.getElementById('diger_donanim').value;
+            
+            let secilenMarka = document.getElementById('marka').value;
+            if(secilenMarka === "Diğer") secilenMarka = "Diğer Marka";
+
+            let hasarOzeti = ekspertizOzetCikar();
+
+            const veri = {
+                yil: document.getElementById('yil').value, 
+                marka: secilenMarka, 
+                model: secilenModel, 
+                renk: document.getElementById('renk').value,
+                kilometre: document.getElementById('kilometre').value, 
+                yakit: document.getElementById('yakit').value, 
+                sanziman: document.getElementById('sanziman').value, 
+                sunroof: document.getElementById('sunroof').value,
+                motor: secilenMotor,
+                donanim: secilenDonanim,
+                tramer: document.getElementById('tramer').value, 
+                hasar_durumu: hasarOzeti, 
+                ad_soyad: document.getElementById('ad_soyad').value, 
+                telefon: document.getElementById('telefon').value
+            };
+
+            const btn = document.querySelector('button[type="submit"]'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Gönderiliyor...';
+
+            try {
+                const res = await fetch('/api/talep-olustur', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(veri) });
+                if(res.ok) {
+                    document.getElementById('degerlemeFormu').classList.add('hidden');
+                    document.getElementById('progressBar').parentElement.parentElement.classList.add('hidden');
+                    document.getElementById('sonucMesaji').classList.remove('hidden');
+                } else { const h = await res.json(); alert("Hata: " + h.hata); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Teklif Al'; }
+            } catch (err) { alert("Sunucuya ulaşılamadı."); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Teklif Al'; }
+        });
+    </script>
+</body>
+</html>
