@@ -269,16 +269,16 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         }
 
         async function talepIncelendi(id) {
-            try {
-                await fetch('/api/talep-durum/' + id, { 
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ durum: 'İncelendi' })
-                });
-                talepModalKapat(); 
-                talepleriGetir(); 
-            } catch(err) { alert("Güncellenirken hata oluştu."); }
-        }
+    try {
+        await fetch('/api/talep-guncelle/' + id, { // BURAYI DÜZELTTİK
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ durum: 'İncelendi' })
+        });
+        talepModalKapat(); 
+        talepleriGetir(); 
+    } catch(err) { alert("Güncellenirken hata oluştu."); }
+}
 
         // İlanlar (Stok)
         async function ilanlariGetir() {
