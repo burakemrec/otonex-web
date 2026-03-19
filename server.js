@@ -123,7 +123,7 @@ app.delete('/api/ilan-sil/:id', async (req, res) => {
   }
 });
 app.get('/admin', (req, res) => {
-    res.sendFile(__dirname + '/admin.html'); 
+    res.sendFile(__dirname + '/public/admin.html');
 });
 
 app.listen(port, () => {
