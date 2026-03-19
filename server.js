@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- VERİTABANI BAĞLANTISI (Supabase / PostgreSQL) ---
 // AŞAĞIDAKİ LİNKİ SUPABASE'DEN ALDIĞIN LİNKLE DEĞİŞTİR.
 // [YOUR-PASSWORD] YAZAN YERE ŞİFRENİ GİRMEYİ UNUTMA!
-const connectionString = postgresql://postgres:[Burakemre1907]@db.hngjuzufomhgufnwkqgi.supabase.co:5432/postgres;
+const connectionString = postgresql://postgres:Burakemre1907@db.hngjuzufomhgufnwkqgi.supabase.co:5432/postgres;
 
 const pool = new Pool({
   connectionString: connectionString,
