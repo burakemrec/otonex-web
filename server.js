@@ -8,10 +8,8 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- VERİTABANI BAĞLANTISI (Supabase / PostgreSQL) ---
-// AŞAĞIDAKİ LİNKİ SUPABASE'DEN ALDIĞIN LİNKLE DEĞİŞTİR.
-// [YOUR-PASSWORD] YAZAN YERE ŞİFRENİ GİRMEYİ UNUTMA!
-const connectionString = 'postgresql://postgres:Burakemre1907@db.hngjuzufomhgufnwkqgi.supabase.co:5432/postgres';
+
+const connectionString = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: connectionString,
