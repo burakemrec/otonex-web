@@ -125,6 +125,17 @@ app.delete('/api/ilan-sil/:id', async (req, res) => {
 app.get('/admin', (req, res) => {
     res.sendFile(__dirname + '/public/admin.html');
 });
+// Admin Giriş Kontrolü
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // Render'daki kasayla, kullanıcının girdiği şifreyi karşılaştır
+    if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
+    }
+});
 
 app.listen(port, () => {
   console.log(`Sunucu ${port} portunda çalışıyor...`);
