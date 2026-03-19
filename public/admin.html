@@ -117,17 +117,44 @@
 
     <script>
         // Giriş
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if(document.getElementById('username').value === "admin" && document.getElementById('password').value === "123456") {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                document.getElementById('adminPanel').classList.add('flex');
-                verileriGetir();
-            } else {
-                alert("Hatalı giriş!");
-            }
+        // Giriş
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const kAdi = document.getElementById('username').value;
+    const sifre = document.getElementById('password').value;
+    const btn = this.querySelector('button[type="submit"]');
+    
+    btn.innerText = "Kontrol ediliyor...";
+    btn.disabled = true;
+
+    try {
+        // Şifreyi sunucuya (server.js) gönder ve sor
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: kAdi, password: sifre })
         });
+
+        const sonuc = await response.json();
+
+        // Sunucudan "success: true" gelirse kapıyı aç
+        if(sonuc.success) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('flex');
+            verileriGetir();
+        } else {
+            alert("Hatalı kullanıcı adı veya şifre!");
+            btn.innerText = "Giriş Yap";
+            btn.disabled = false;
+        }
+    } catch(err) {
+        alert("Bağlantı hatası oluştu.");
+        btn.innerText = "Giriş Yap";
+        btn.disabled = false;
+    }
+});
 
         // Sekme Geçişi
         function sekmeDegistir(sekmeAdi) {
