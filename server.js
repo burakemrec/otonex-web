@@ -122,6 +122,9 @@ app.delete('/api/ilan-sil/:id', async (req, res) => {
     res.status(500).json({ hata: err.message });
   }
 });
+app.get('/admin', (req, res) => {
+    res.sendFile(__dirname + '/admin.html'); 
+});
 
 app.listen(port, () => {
   console.log(`Sunucu ${port} portunda çalışıyor...`);
