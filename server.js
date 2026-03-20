@@ -33,12 +33,13 @@ pool.connect((err, client, release) => {
     );
   `;
   
+  // DÜZELTME: "motor VARCHAR(100)" buraya eklendi
   const createIlanlar = `
     CREATE TABLE IF NOT EXISTS ilanlar (
       id SERIAL PRIMARY KEY, 
       marka VARCHAR(100), model VARCHAR(100), yil INTEGER, kilometre INTEGER, 
       fiyat VARCHAR(50), resim_url TEXT, yakit VARCHAR(50), sanziman VARCHAR(50), 
-      donanim VARCHAR(100), hasar_durumu TEXT, 
+      motor VARCHAR(100), donanim VARCHAR(100), hasar_durumu TEXT, 
       olusturulma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
@@ -93,9 +94,12 @@ app.delete('/api/talep-sil/:id', async (req, res) => {
 // --- İLANLAR API ---
 app.post('/api/ilan-ekle', async (req, res) => {
   const d = req.body;
-  const query = `INSERT INTO ilanlar (marka, model, yil, kilometre, fiyat, resim_url, yakit, sanziman, donanim, hasar_durumu) 
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
-  const values = [d.marka, d.model, d.yil, d.kilometre, d.fiyat, d.resim_url, d.yakit, d.sanziman, d.donanim, d.hasar_durumu];
+  // DÜZELTME: "motor" sütunu ve "$11" parametresi eklendi
+  const query = `INSERT INTO ilanlar (marka, model, yil, kilometre, fiyat, resim_url, yakit, sanziman, motor, donanim, hasar_durumu) 
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
+  
+  // DÜZELTME: d.motor diziye eklendi
+  const values = [d.marka, d.model, d.yil, d.kilometre, d.fiyat, d.resim_url, d.yakit, d.sanziman, d.motor, d.donanim, d.hasar_durumu];
   
   try {
     await pool.query(query, values);
@@ -122,14 +126,15 @@ app.delete('/api/ilan-sil/:id', async (req, res) => {
     res.status(500).json({ hata: err.message });
   }
 });
+
 app.get('/admin', (req, res) => {
     res.sendFile(__dirname + '/public/admin.html');
 });
+
 // Admin Giriş Kontrolü
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     
-    // Render'daki kasayla, kullanıcının girdiği şifreyi karşılaştır
     if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
         res.json({ success: true });
     } else {
