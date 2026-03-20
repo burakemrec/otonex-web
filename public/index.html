@@ -539,8 +539,8 @@ MERSİS No: (Şirketinizin resmi MERSİS numarası yazılacaktır.)`
         };
 
         function metinModalGoster(tur) {
-            document.getElementById('metinModalBaslik').innerText = modalMetinleri[tur].baslik;
-            document.getElementById('metinModalIcerik').innerText = modalMetinleri[tur].icerik;
+            document.getElementById('metinModalBaslik').innerHTML = modalMetinleri[tur].baslik;
+            document.getElementById('metinModalIcerik').innerHTML = modalMetinleri[tur].icerik;
             document.getElementById('metinModal').classList.remove('hidden');
         }
 
