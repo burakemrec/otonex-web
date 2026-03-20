@@ -587,19 +587,51 @@ MERSİS No: (Şirketinizin resmi MERSİS numarası yazılacaktır.)`
         }
 
         function ilanDetayGoster(id) {
-            const arac = globalVitrinIlanlari.find(i => i.id === id); if(!arac) return;
-            document.getElementById('modalResim').src = arac.resim_url || 'https://via.placeholder.com/800x400';
-            document.getElementById('modalBaslik').innerText = arac.marka + ' ' + arac.model;
-            document.getElementById('modalFiyat').innerText = arac.fiyat;
-            document.getElementById('modalYil').innerText = arac.yil;
-            document.getElementById('modalKm').innerText = Number(arac.kilometre).toLocaleString('tr-TR') + ' KM';
-            document.getElementById('modalYakit').innerText = arac.yakit || 'Belirtilmemiş';
-            document.getElementById('modalSanziman').innerText = arac.sanziman || 'Belirtilmemiş';
-            document.getElementById('modalMotor').innerText = ilan.motor || 'Belirtilmemiş';
-            document.getElementById('modalDonanim').innerText = arac.donanim || 'Belirtilmemiş';
-            document.getElementById('modalHasar').innerText = arac.hasar_durumu || 'Belirtilmemiş';
-            document.getElementById('detayModal').classList.remove('hidden');
+    try {
+        // 1. İŞTE HATAYI ÇÖZEN SATIR: Hangi araca tıklandığını buluyoruz
+        const ilan = globalIlanlar.find(x => x.id === id);
+        
+        // Eğer araç listede bulunamazsa işlemi durdur (hata vermesini engeller)
+        if (!ilan) {
+            console.error("Hata: Tıklanan araç hafızada bulunamadı.");
+            return;
         }
+
+        // 2. 404 RESİM HATASINI ÇÖZEN KISIM: Resim yoksa boş sayfa göstersin
+        const resimYeri = document.getElementById('modalResim');
+        if (resimYeri) {
+            if (ilan.resim_url && ilan.resim_url.length > 5) {
+                resimYeri.src = ilan.resim_url;
+            } else {
+                resimYeri.src = "https://via.placeholder.com/800x400?text=Görsel+Bulunmuyor";
+            }
+        }
+
+        // 3. Verileri güvenli bir şekilde ekrana basıyoruz
+        if (document.getElementById('modalBaslik')) document.getElementById('modalBaslik').innerText = `${ilan.marka} ${ilan.model}`;
+        if (document.getElementById('modalFiyat')) document.getElementById('modalFiyat').innerText = ilan.fiyat;
+        if (document.getElementById('modalYil')) document.getElementById('modalYil').innerText = ilan.yil;
+        if (document.getElementById('modalKm')) document.getElementById('modalKm').innerText = Number(ilan.kilometre).toLocaleString('tr-TR') + ' KM';
+        if (document.getElementById('modalYakit')) document.getElementById('modalYakit').innerText = ilan.yakit || '-';
+        if (document.getElementById('modalSanziman')) document.getElementById('modalSanziman').innerText = ilan.sanziman || '-';
+        
+        // Motor kısmı tam gaz çalışacak!
+        if (document.getElementById('modalMotor')) document.getElementById('modalMotor').innerText = ilan.motor ? ilan.motor : 'Belirtilmemiş';
+        
+        if (document.getElementById('modalDonanim')) document.getElementById('modalDonanim').innerText = ilan.donanim || '-';
+        if (document.getElementById('modalHasar')) document.getElementById('modalHasar').innerText = ilan.hasar_durumu || '-';
+
+        // 4. Tüm veriler dolduktan sonra pencereyi şov yaparak aç!
+        const modal = document.getElementById('detayModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+
+    } catch (error) {
+        // Eğer başka bir şey bozulursa siteyi çökertmek yerine sadece konsola yaz
+        console.error("Pencere açılırken beklenmeyen bir hata oluştu:", error);
+    }
+}
         function modalKapat() { document.getElementById('detayModal').classList.add('hidden'); }
 
         document.addEventListener('DOMContentLoaded', () => { 
